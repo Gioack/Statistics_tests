@@ -1,0 +1,28 @@
+from cProfile import label
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+Tempo = np.arange(0,100,0.001)
+Capitale = (1+0.07/12)**(Tempo*12) 
+Capitale1 = (1+0.07)**(Tempo)
+Capitale2 = (1+0.07/365)**(Tempo*365) 
+#print(data["Name"])
+#print(data["Age"])
+fig, ax = plt.subplots()
+ax.yaxis.set_major_formatter('£{x:1.2f}')
+ax.set_ylabel('Capitale')
+ax.set_xlabel('Anni')
+#ax.set_title("Crescita del capitale")
+ax = plt.plot(Tempo,Capitale,label= "Reinvestimento mensile",linewidth=3.5)
+#abx = plt.plot(Tempo,Capitale1,label="Reinvestimento annuale")
+abx = plt.plot(Tempo,Capitale2,label="Reinvestimento quotidiano")
+plt.legend()
+#grid_x_ticks = np.arange(0, 42.5, 20)
+#grid_y_ticks = np.arange(0, 17, 20)
+#bx.set_xticks(grid_x_ticks , minor=True)
+#bx.set_yticks(grid_y_ticks , minor=True)
+plt.xlim(0, 100)
+plt.ylim(0, 1400)
+plt.grid()
+#plt.margins(x=0, y=-0.25)
+plt.show()
