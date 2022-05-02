@@ -1,90 +1,68 @@
 import pandas as pd
-#import seaborn as sns
+import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Import data
 df = pd.read_csv("https://raw.githubusercontent.com/freeCodeCamp/boilerplate-medical-data-visualizer/master/medical_examination.csv",index_col=0)
 
-# Add 'overweight' column
 df['overweight'] = df.weight/((df.height/100)**2)
 df.loc[df["overweight"]<=25, "overweight"] = 0
 df.loc[df["overweight"]>25, "overweight"] = 1
 
-# Normalize data by making 0 always good and 1 always bad. If the value of 'cholesterol' or 'gluc' is 1, make the value 0. If the value is more than 1, make the value 1.
+# the following normalizes data by making 0 always good and 1 always bad.
 df.loc[df["cholesterol"] == 1, "cholesterol"] = 0
 df.loc[df["cholesterol"]>1, "cholesterol"] = 1
 df.loc[df["gluc"] == 1, "gluc"] = 0
 df.loc[df["gluc"]>1, "gluc"] = 1
-# Draw Categorical Plot
+
 def draw_cat_plot():
-    # Create DataFrame for cat plot using `pd.melt` using just the values from 'cholesterol', 'gluc', 'smoke', 'alco', 'active', and 'overweight'.
-    df_cat = None
+    
+    df_cat = pd.melt(df.loc[:, "cholesterol":"overweight"], id_vars=["cardio"])
+    df_cat_0cardio = df_cat.loc[df_cat["cardio"] == 0, "variable":"value"]
+    df_cat_1cardio = df_cat.loc[df_cat["cardio"] == 1, "variable":"value"]
+    df_cat_0cardio.sort_values('variable', inplace=True)
+    df_cat_1cardio.sort_values('variable', inplace=True)
+    fig, (ax1,ax2) = plt.subplots(1,2,sharey=True,figsize=[12,8])
+    fig.subplots_adjust(wspace=0)
+    ax1.set_title("Cardio-0")
+    ax2.set_title("Cardio-1")
+    sns.countplot(x="variable",hue = "value",data=df_cat_0cardio,ax=ax1)
+    sns.countplot(x="variable",hue = "value",data=df_cat_1cardio,ax=ax2)
+    ax1.set_ylabel("Total")
+    ax2.set_ylabel("")
+    ax1.get_legend().set_visible(False)
+    ax2.get_legend().set_visible(False)
+    handles, labels = ax1.get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper left')
+    plt.show()
 
-
-    # Group and reformat the data to split it by 'cardio'. Show the counts of each feature. You will have to rename one of the columns for the catplot to work correctly.
-    df_cat = None
-
-    # Draw the catplot with 'sns.catplot()'
-
-
-
-    # Do not modify the next two lines
-    fig.savefig('catplot.png')
     return fig
-# Clean the data
-#print(df.loc[((df['height'] <= Quantile_25_height)
-               # | (df['height'] >= Quantile_975_height) ), "ap_hi"].count())
-# print(df.loc[df['ap_lo'] > df['ap_hi'], "ap_hi"].count())
-Filter_pressure  = (df['ap_lo'] <= df['ap_hi'])
-# print(Filter_pressure.sum())
-# print(Filter_pressure.count())
-df = df[Filter_pressure ]
 
-# print(df.loc[df['ap_lo'] > df['ap_hi'], "ap_hi"].count())
+
+Filter_pressure  = (df['ap_lo'] <= df['ap_hi'])
+df = df[Filter_pressure]
 
 Quantile_25_height = df["height"].quantile(0.025)
 Quantile_975_height = df["height"].quantile(0.975)
 Quantile_25_weight = df["weight"].quantile(0.025)
 Quantile_975_weight = df["weight"].quantile(0.975)
 
-print(df.loc[df['height'] < Quantile_25_height, "ap_hi"].count())
-# print(Filter_height.sum())
 Filter_height = ((df['height'] >= Quantile_25_height)
                 & (df['height'] <= Quantile_975_height) )
 df = df[Filter_height]
-print(Quantile_25_height)
 Filter_weight = ((df['weight'] >= Quantile_25_weight)
                 & (df['weight'] <= Quantile_975_weight))
 df = df[Filter_weight]
 
-# print(df.loc[((df['height'] <= Quantile_25_height)
-                # (df['height'] >= Quantile_975_height) ), "ap_hi"].count())
-
-print(df.loc[df['height'] < Quantile_25_height, "ap_hi"].count())
-print(df.loc[df['height'] > Quantile_975_height, "ap_hi"].count())
-print(df.loc[df['weight'] < Quantile_25_weight, "ap_hi"].count())
-print(df.loc[df['weight'] > Quantile_975_weight, "ap_hi"].count())
-
-# Draw Heat Map
 def draw_heat_map():
-    df_heat = None
-
-    # Calculate the correlation matrix
-    corr = None
-
-    # Generate a mask for the upper triangle
-    mask = None
-
-
-
-    # Set up the matplotlib figure
-    fig, ax = None
-
-    # Draw the heatmap with 'sns.heatmap()'
-
-
-
-    # Do not modify the next two lines
-    fig.savefig('heatmap.png')
+    
+    corr = df.corr()
+    corr = corr.round(2)
+    
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+    
+    fig, ax = plt.subplots(figsize=[12,8])
+    sns.heatmap(corr,mask=mask,annot=True,ax=ax)
+    plt.show()
     return fig
+
