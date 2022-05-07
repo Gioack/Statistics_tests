@@ -44,5 +44,4 @@ def draw_box_plot():
     sns.boxplot(x="month",y="value",data=df_box,ax=ax2)
     ax2.set_ylabel("")
     ax1.set_ylabel("Page Views")
-
     plt.show()
